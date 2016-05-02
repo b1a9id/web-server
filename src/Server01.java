@@ -45,15 +45,21 @@ public class Server01 {
 				}
 
 				OutputStream outputStream = socket.getOutputStream();
-				setResponseHeader(outputStream);
 
 				try (FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + fileName)) {
+					setResponseHeader(outputStream);
 					int ch;
 					while ((ch = fileInputStream.read()) != -1) {
 						outputStream.write(ch);
 					}
 				} catch (FileNotFoundException e) {
-					e.getStackTrace();
+					setNotFoundResponseHeader(outputStream);
+					try(FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + "/404.html")) {
+						int ch;
+						while ((ch = fileInputStream.read()) != -1) {
+							outputStream.write(ch);
+						}
+					}
 				}
 				socket.close();
 			}
@@ -63,7 +69,7 @@ public class Server01 {
 	}
 
 	public static void setResponseHeader(OutputStream outputStream) throws Exception {
-		String[] header = {
+		String[] successHeader = {
 				"HTTP/1.1 200 OK",
 				"Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
 				"Server: Server01.java",
@@ -72,8 +78,27 @@ public class Server01 {
 				""
 		};
 
-		for (int i = 0; i < header.length; i++) {
-			for (char ch : header[i].toCharArray()) {
+		for (int i = 0; i < successHeader.length; i++) {
+			for (char ch : successHeader[i].toCharArray()) {
+				outputStream.write((int) ch);
+			}
+			outputStream.write((int) '\r');
+			outputStream.write((int) '\n');
+		}
+	}
+
+	public static void setNotFoundResponseHeader(OutputStream outputStream) throws Exception {
+		String[] notFoundHeader = {
+				"HTTP/1.1 404 Not Found",
+				"Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
+				"Server: Server01.java",
+				"Connection: close",
+				"Content-type: text/html",
+				""
+		};
+
+		for (int i = 0; i < notFoundHeader.length; i++) {
+			for (char ch : notFoundHeader[i].toCharArray()) {
 				outputStream.write((int) ch);
 			}
 			outputStream.write((int) '\r');
