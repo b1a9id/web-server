@@ -4,10 +4,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 
 /**
  * Created by uchitate on 2016/04/30.
@@ -47,13 +43,13 @@ public class Server01 {
 				OutputStream outputStream = socket.getOutputStream();
 
 				try (FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + fileName)) {
-					setResponseHeader(outputStream);
+					ResponseHeader.setResponseHeader(outputStream, prefix);
 					int ch;
 					while ((ch = fileInputStream.read()) != -1) {
 						outputStream.write(ch);
 					}
 				} catch (FileNotFoundException e) {
-					setNotFoundResponseHeader(outputStream);
+					ResponseHeader.setNotFoundResponseHeader(outputStream);
 					try(FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + "/404.html")) {
 						int ch;
 						while ((ch = fileInputStream.read()) != -1) {
@@ -65,44 +61,6 @@ public class Server01 {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-
-	public static void setResponseHeader(OutputStream outputStream) throws Exception {
-		String[] successHeader = {
-				"HTTP/1.1 200 OK",
-				"Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
-				"Server: Server01.java",
-				"Connection: close",
-				"Content-type: " + getContentType(prefix),
-				""
-		};
-
-		for (int i = 0; i < successHeader.length; i++) {
-			for (char ch : successHeader[i].toCharArray()) {
-				outputStream.write((int) ch);
-			}
-			outputStream.write((int) '\r');
-			outputStream.write((int) '\n');
-		}
-	}
-
-	public static void setNotFoundResponseHeader(OutputStream outputStream) throws Exception {
-		String[] notFoundHeader = {
-				"HTTP/1.1 404 Not Found",
-				"Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
-				"Server: Server01.java",
-				"Connection: close",
-				"Content-type: text/html",
-				""
-		};
-
-		for (int i = 0; i < notFoundHeader.length; i++) {
-			for (char ch : notFoundHeader[i].toCharArray()) {
-				outputStream.write((int) ch);
-			}
-			outputStream.write((int) '\r');
-			outputStream.write((int) '\n');
 		}
 	}
 
@@ -121,18 +79,5 @@ public class Server01 {
 		return readChar == -1 ? null : ret;
 	}
 
-	public static String getContentType(String prefix) {
-		HashMap<String, String> contentTypeMap = new HashMap<String, String>() {{
-			put("html", "text/html");
-			put("htm", "text/html");
-			put("txt", "text/plain");
-			put("css", "text/css");
-			put("png", "image/png");
-			put("jpg", "image/jpeg");
-			put("jpeg", "image/jpeg");
-			put("gif", "image/gif");
-		}};
 
-		return contentTypeMap.get(prefix);
-	}
 }
