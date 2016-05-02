@@ -31,7 +31,7 @@ public class Server01 {
 				Thread thread = ServerThread.generateThread();
 				thread.start();
 
-				InputStream inputStream = socket.getInputStream();
+				BufferedInputStream inputStream = new BufferedInputStream(socket.getInputStream());
 				String line;
 				while ((line = readLine(inputStream)) != null) {
 					if (line == "") {
