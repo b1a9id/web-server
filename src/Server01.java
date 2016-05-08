@@ -41,19 +41,18 @@ public class Server01 {
 				}
 
 				OutputStream outputStream = socket.getOutputStream();
-
 				try (FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + fileName)) {
 					ResponseHeader.setResponseHeader(outputStream, prefix);
-					int ch;
-					while ((ch = fileInputStream.read()) != -1) {
-						outputStream.write(ch);
+					int byteData;
+					while ((byteData = fileInputStream.read()) != -1) {
+						outputStream.write(byteData);
 					}
 				} catch (FileNotFoundException e) {
 					ResponseHeader.setNotFoundResponseHeader(outputStream);
 					try(FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + "/404.html")) {
-						int ch;
-						while ((ch = fileInputStream.read()) != -1) {
-							outputStream.write(ch);
+						int byteData;
+						while ((byteData = fileInputStream.read()) != -1) {
+							outputStream.write(byteData);
 						}
 					}
 				}
@@ -65,18 +64,18 @@ public class Server01 {
 	}
 
 	private static String readLine(InputStream input) throws Exception {
-		int readChar;
+		int byteData;
 		String ret = "";
-		while ((readChar = input.read()) != -1) {
-			if (readChar == '\r') {
+		while ((byteData = input.read()) != -1) {
+			if (byteData == '\r') {
 				// 何もしない
-			} else if (readChar == '\n') {
+			} else if (byteData == '\n') {
 				break;
 			} else {
-				ret += (char) readChar;
+				ret += (char) byteData;
 			}
 		}
-		return readChar == -1 ? null : ret;
+		return byteData == -1 ? null : ret;
 	}
 
 
