@@ -3,11 +3,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ResponseHeader {
 
-	public static String getContentType(String prefix) {
-		HashMap<String, String> contentTypeMap = new HashMap<String, String>() {{
+	public static final String getContentType(String prefix) {
+		Map<String, String> contentTypeMap = new ConcurrentHashMap<String, String>() {{
 			put("html", "text/html");
 			put("htm", "text/html");
 			put("txt", "text/plain");
@@ -59,3 +61,4 @@ public class ResponseHeader {
 		}
 	}
 }
+//statuss code 304対応

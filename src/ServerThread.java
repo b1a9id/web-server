@@ -10,6 +10,7 @@ public class ServerThread {
 //						IntStream.rangeClosed(0, 10000).forEach(System.out::println);
 			}
 		});
+		System.out.println(thread.getName());
 		return thread;
 	}
 }

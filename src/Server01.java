@@ -1,3 +1,4 @@
+import javax.swing.plaf.SliderUI;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -35,6 +36,9 @@ public class Server01 {
 					}
 					if (line.startsWith("GET")) {
 						fileName = line.split(" ")[1];
+						if (fileName.equals("/index2.html")) {
+							Thread.sleep(5000);
+						}
 						String[] tmp = fileName.split("\\.");
 						prefix = tmp[tmp.length -1];
 					}
