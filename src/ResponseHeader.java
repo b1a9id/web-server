@@ -2,11 +2,14 @@ import java.io.OutputStream;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ResponseHeader {
+
+	private static final String NOT_FOUND_PREFIX = "NotFound";
 
 	public static final String getContentType(String prefix) {
 		Map<String, String> contentTypeMap = new ConcurrentHashMap<String, String>() {{
@@ -24,17 +27,21 @@ public class ResponseHeader {
 	}
 
 	public static void setResponseHeader(OutputStream outputStream, String prefix) throws Exception {
-		String[] successHeader = {
-				"HTTP/1.1 200 OK",
-				"Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
-				"Server: Server01.java",
-				"Connection: close",
-				"Content-type: " + getContentType(prefix),
-				""
-		};
+		List list = new ArrayList<>();
+		String requestLine = prefix.equals(NOT_FOUND_PREFIX) ? "HTTP/1.1 404 Not Found" : "HTTP/1.1 200 OK";
+		list.add(requestLine);
+		list.add("Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME));
+		list.add("Server: Server01.java");
+		list.add("Connection: close");
+		prefix = prefix.equals(NOT_FOUND_PREFIX) ? "html" : prefix;
+		list.add("Content-type: " + getContentType(prefix));
+		list.add("");
 
-		for (int i = 0; i < successHeader.length; i++) {
-			for (char ch : successHeader[i].toCharArray()) {
+		String[] header = new String[list.size()];
+		list.toArray(header);
+
+		for (int i = 0; i < header.length; i++) {
+			for (char ch : header[i].toCharArray()) {
 				outputStream.write((int) ch);
 			}
 			outputStream.write((int) '\r');
@@ -43,22 +50,7 @@ public class ResponseHeader {
 	}
 
 	public static void setNotFoundResponseHeader(OutputStream outputStream) throws Exception {
-		String[] notFoundHeader = {
-				"HTTP/1.1 404 Not Found",
-				"Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
-				"Server: Server01.java",
-				"Connection: close",
-				"Content-type: text/html",
-				""
-		};
-
-		for (int i = 0; i < notFoundHeader.length; i++) {
-			for (char ch : notFoundHeader[i].toCharArray()) {
-				outputStream.write((int) ch);
-			}
-			outputStream.write((int) '\r');
-			outputStream.write((int) '\n');
-		}
+		setResponseHeader(outputStream, NOT_FOUND_PREFIX);
 	}
 }
 //statuss code 304対応

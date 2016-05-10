@@ -4,7 +4,13 @@ import java.util.Random;
  * Created by uchitate on 2016/05/10.
  */
 public class Sample {
+	static TimeObj obj[] = new TimeObj[3];
 
+	public static void main(String[] args) {
+		for (int i = 0; i < 3; i++) {
+			obj[i] = new TimeObj(i);
+		}
+	}
 }
 
 class TimeObj implements Runnable {
@@ -20,9 +26,10 @@ class TimeObj implements Runnable {
 		Random random = new Random();
 		delay = random.nextInt(700) + 300;
 		new Thread(this).start();
-		System.out.println("*id : " + id + "start.*");
+		System.out.println("*id : " + id + " start.*");
  	}
 
+	@Override
 	public void run() {
 		while (!kiss_of_death) {
 			System.out.println(id + ": count " + ++num);
