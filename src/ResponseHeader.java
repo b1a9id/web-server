@@ -28,8 +28,8 @@ public class ResponseHeader {
 
 	public static void setResponseHeader(OutputStream outputStream, String prefix) throws Exception {
 		List list = new ArrayList<>();
-		String requestLine = prefix.equals(NOT_FOUND_PREFIX) ? "HTTP/1.1 404 Not Found" : "HTTP/1.1 200 OK";
-		list.add(requestLine);
+		String statusLine = prefix.equals(NOT_FOUND_PREFIX) ? "HTTP/1.1 404 Not Found" : "HTTP/1.1 200 OK";
+		list.add(statusLine);
 		list.add("Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME));
 		list.add("Server: Server01.java");
 		list.add("Connection: close");
@@ -37,11 +37,11 @@ public class ResponseHeader {
 		list.add("Content-type: " + getContentType(prefix));
 		list.add("");
 
-		String[] header = new String[list.size()];
-		list.toArray(header);
+		String[] responseMsg = new String[list.size()];
+		list.toArray(responseMsg);
 
-		for (int i = 0; i < header.length; i++) {
-			for (char ch : header[i].toCharArray()) {
+		for (int i = 0; i < responseMsg.length; i++) {
+			for (char ch : responseMsg[i].toCharArray()) {
 				outputStream.write((int) ch);
 			}
 			outputStream.write((int) '\r');
