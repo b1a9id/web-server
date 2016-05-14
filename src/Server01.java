@@ -12,8 +12,8 @@ public class Server01 {
 
 		try (ServerSocket listener = new ServerSocket()) {
 			listener.setReuseAddress(true);
-			listener.bind(new InetSocketAddress(8001));
-			System.out.println("Server listening on port 8001");
+			listener.bind(new InetSocketAddress(8002));
+			System.out.println("Server listening on port 8002");
 
 			while (true) {
 				Socket socket = listener.accept();

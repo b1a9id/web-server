@@ -2,14 +2,10 @@ import java.io.OutputStream;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ResponseHeader {
-
-	private static final String NOT_FOUND_PREFIX = "NotFound";
 
 	public static final String getContentType(String prefix) {
 		Map<String, String> contentTypeMap = new ConcurrentHashMap<String, String>() {{
@@ -26,22 +22,18 @@ public class ResponseHeader {
 		return contentTypeMap.get(prefix);
 	}
 
-	public static void setResponseHeader(OutputStream outputStream, String prefix) throws Exception {
-		List list = new ArrayList<>();
-		String statusLine = prefix.equals(NOT_FOUND_PREFIX) ? "HTTP/1.1 404 Not Found" : "HTTP/1.1 200 OK";
-		list.add(statusLine);
-		list.add("Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME));
-		list.add("Server: Server01.java");
-		list.add("Connection: close");
-		prefix = prefix.equals(NOT_FOUND_PREFIX) ? "html" : prefix;
-		list.add("Content-type: " + getContentType(prefix));
-		list.add("");
+	public static void sendOkResponse(OutputStream outputStream, String prefix) throws Exception {
+		String[] response = {
+				"HTTP/1.1 200 OK",
+				"Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
+				"Server: Server01.java",
+				"Connection: close",
+				"Content-type: " + getContentType(prefix),
+				""
+		};
 
-		String[] responseMsg = new String[list.size()];
-		list.toArray(responseMsg);
-
-		for (int i = 0; i < responseMsg.length; i++) {
-			for (char ch : responseMsg[i].toCharArray()) {
+		for (int i = 0; i < response.length; i++) {
+			for (char ch : response[i].toCharArray()) {
 				outputStream.write((int) ch);
 			}
 			outputStream.write((int) '\r');
@@ -49,8 +41,42 @@ public class ResponseHeader {
 		}
 	}
 
-	public static void setNotFoundResponseHeader(OutputStream outputStream) throws Exception {
-		setResponseHeader(outputStream, NOT_FOUND_PREFIX);
+	public static void sendNotFoundResponse(OutputStream outputStream) throws Exception {
+		String[] response = {
+				"HTTP/1.1 404 Not Found",
+				"Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
+				"Server: Server01.java",
+				"Connection: close",
+				"Content-type: " + getContentType("html"),
+				""
+		};
+
+		for (int i = 0; i < response.length; i++) {
+			for (char ch : response[i].toCharArray()) {
+				outputStream.write((int) ch);
+			}
+			outputStream.write((int) '\r');
+			outputStream.write((int) '\n');
+		}
 	}
+
+	public static void sendMovedPermanentlyResponse(OutputStream outputStream, String url) throws Exception {
+		String[] response = {
+				"HTTP/1.1 301 Moved Permanently",
+				"Date: " + ZonedDateTime.now(ZoneId.of("GMT")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
+				"Server: Server01.java",
+				"Location: " + url,
+				"Connection: close",
+				""
+		};
+
+		for (String responseLine : response) {
+			for (char ch : responseLine.toCharArray()) {
+				outputStream.write((int) ch);
+			}
+			outputStream.write((int) '\r');
+			outputStream.write((int) '\n');
+		}
+	}
+
 }
-//statuss code 304対応

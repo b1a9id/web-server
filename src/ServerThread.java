@@ -1,6 +1,9 @@
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Paths;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Created by uchitate on 2016/05/01.
@@ -8,6 +11,10 @@ import java.nio.file.Paths;
 public class ServerThread implements Runnable {
 
 	private Socket socket;
+
+	private final String DOCUMENT_ROOT = "/Users/uchitate/IdeaProject/webserver/resources";
+
+	private final String SERVER_NAME = "localhost:8002";
 
 	public ServerThread(Socket socket) {
 		this.socket = socket;
@@ -22,6 +29,7 @@ public class ServerThread implements Runnable {
 			String line;
 			String fileName = null;
 			String prefix = null;
+			String host = null;
 			while ((line = readLine(inputStream)) != null) {
 				if (line == "") {
 					break;
@@ -30,23 +38,31 @@ public class ServerThread implements Runnable {
 					fileName = line.split(" ")[1];
 					String[] tmp = fileName.split("\\.");
 					prefix = tmp[tmp.length - 1];
+				} else if (line.startsWith("Host:")) {
+					host = line.substring("Host: ".length());
 				}
 			}
 
-			String DOCUMENT_ROOT = Paths.get(System.getProperty("user.dir") + File.separator + "resources").toString();
 			OutputStream outputStream = socket.getOutputStream();
 			try (FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + fileName)) {
-				ResponseHeader.setResponseHeader(outputStream, prefix);
+				ResponseHeader.sendOkResponse(outputStream, prefix);
 				int byteData;
 				while ((byteData = fileInputStream.read()) != -1) {
 					outputStream.write(byteData);
 				}
 			} catch (FileNotFoundException e) {
-				ResponseHeader.setNotFoundResponseHeader(outputStream);
-				try (FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + "/404.html")) {
-					int byteData;
-					while ((byteData = fileInputStream.read()) != -1) {
-						outputStream.write(byteData);
+				FileSystem fileSystem = FileSystems.getDefault();
+				Path path = fileSystem.getPath(DOCUMENT_ROOT + fileName);
+				if (Files.isDirectory(path)) {
+					String url = "http://" + ((host != null ? host : SERVER_NAME)) + "/index.html" + File.separator;
+					ResponseHeader.sendMovedPermanentlyResponse(outputStream, url);
+				} else {
+					ResponseHeader.sendNotFoundResponse(outputStream);
+					try (FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + File.separator + "404.html")) {
+						int byteData;
+						while ((byteData = fileInputStream.read()) != -1) {
+							outputStream.write(byteData);
+						}
 					}
 				}
 			}
