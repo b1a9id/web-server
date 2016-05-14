@@ -1,3 +1,7 @@
+import ResponseHeader.ResponseHeader2xx;
+import ResponseHeader.ResponseHeader3xx;
+import ResponseHeader.ResponseHeader4xx;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.FileSystem;
@@ -45,7 +49,7 @@ public class ServerThread implements Runnable {
 
 			OutputStream outputStream = socket.getOutputStream();
 			try (FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + fileName)) {
-				ResponseHeader.sendOkResponse(outputStream, prefix);
+				ResponseHeader2xx.sendOkResponse(outputStream, prefix);
 				int byteData;
 				while ((byteData = fileInputStream.read()) != -1) {
 					outputStream.write(byteData);
@@ -55,9 +59,9 @@ public class ServerThread implements Runnable {
 				Path path = fileSystem.getPath(DOCUMENT_ROOT + fileName);
 				if (Files.isDirectory(path)) {
 					String url = "http://" + ((host != null ? host : SERVER_NAME)) + "/index.html" + File.separator;
-					ResponseHeader.sendMovedPermanentlyResponse(outputStream, url);
+					ResponseHeader3xx.sendMovedPermanentlyResponse(outputStream, url);
 				} else {
-					ResponseHeader.sendNotFoundResponse(outputStream);
+					ResponseHeader4xx.sendNotFoundResponse(outputStream);
 					try (FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + File.separator + "404.html")) {
 						int byteData;
 						while ((byteData = fileInputStream.read()) != -1) {
