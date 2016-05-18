@@ -5,9 +5,10 @@ import ResponseHeader.ResponseHeader4xx;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Created by uchitate on 2016/05/01.
@@ -34,6 +35,7 @@ public class ServerThread implements Runnable {
 			String fileName = null;
 			String prefix = null;
 			String host = null;
+			String modifiedDate = null;
 			while ((line = readLine(inputStream)) != null) {
 				if (line == "") {
 					break;
@@ -44,15 +46,28 @@ public class ServerThread implements Runnable {
 					prefix = tmp[tmp.length - 1];
 				} else if (line.startsWith("Host:")) {
 					host = line.substring("Host: ".length());
+				} else if (line.startsWith("If-Modified-Since:")) {
+					modifiedDate = line.substring("If-Modified-Since: ".length());
 				}
 			}
 
 			OutputStream outputStream = socket.getOutputStream();
 			try (FileInputStream fileInputStream = new FileInputStream(DOCUMENT_ROOT + fileName)) {
-				ResponseHeader2xx.sendOkResponse(outputStream, prefix);
-				int byteData;
-				while ((byteData = fileInputStream.read()) != -1) {
-					outputStream.write(byteData);
+				FileSystem fileSystem = FileSystems.getDefault();
+				Path path = fileSystem.getPath(DOCUMENT_ROOT + fileName);
+				String fileTime = Files.getLastModifiedTime(path, LinkOption.NOFOLLOW_LINKS)
+						.toInstant()
+						.atZone(ZoneId.of("GMT"))
+						.format(DateTimeFormatter.RFC_1123_DATE_TIME);
+
+				if (modifiedDate != null && modifiedDate.equals(fileTime)) {
+					ResponseHeader3xx.sendNotModified(outputStream, prefix, fileTime);
+				} else {
+					ResponseHeader2xx.sendOkResponse(outputStream, prefix);
+					int byteData;
+					while ((byteData = fileInputStream.read()) != -1) {
+						outputStream.write(byteData);
+					}
 				}
 			} catch (FileNotFoundException e) {
 				FileSystem fileSystem = FileSystems.getDefault();
