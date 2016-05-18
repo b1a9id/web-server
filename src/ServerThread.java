@@ -6,13 +6,9 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.file.FileSystem;
 import java.nio.file.*;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Created by uchitate on 2016/05/01.
- */
 public class ServerThread implements Runnable {
 
 	private Socket socket;
