@@ -1,1 +1,10 @@
-クライアントからの送信
+GET / HTTP/1.1
+Host: localhost:8001
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: ja,en-US;q=0.8,en;q=0.6
+Cookie: JSESSIONID=7FBBE18009C4A51D2753624AAB6D6F50
+

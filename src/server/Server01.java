@@ -3,7 +3,6 @@ package server;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -22,13 +21,6 @@ public class Server01 {
             while ((ch = inputStream.read()) != 0) {
                 fileOutputStream.write(ch);
             }
-
-            OutputStream outputStream = socket.getOutputStream();
-            while ((ch = fileInputStream.read()) != -1) {
-                outputStream.write(ch);
-            }
-
-            outputStream.write(0);
 
             socket.close();
         } catch (Exception e) {
