@@ -11,9 +11,9 @@ import java.net.Socket;
  */
 public class Client01 {
     public static void main(String[] args) throws Exception {
-        try(Socket socket = new Socket("localhost", 8001);
-            FileOutputStream fileOutputStream = new FileOutputStream("resources/text/client/client_receive.txt");
-            FileInputStream fileInputStream = new FileInputStream("resources/text/client/client_send.txt")) {
+        try(Socket socket = new Socket("localhost", 80);
+            FileOutputStream fileOutputStream = new FileOutputStream("/Users/ryosuke/IdeProjectIntelliJ/web-server/resources/text/client/client_receive.txt");
+            FileInputStream fileInputStream = new FileInputStream("/Users/ryosuke/IdeProjectIntelliJ/web-server/resources/text/client/client_send.txt")) {
 
             int ch;
             OutputStream outputStream = socket.getOutputStream();
@@ -21,7 +21,7 @@ public class Client01 {
                 outputStream.write(ch);
             }
 
-            outputStream.write(0);
+//            outputStream.write(0);
 
             InputStream inputStream = socket.getInputStream();
             while ((ch = inputStream.read()) != -1) {
