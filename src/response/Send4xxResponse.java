@@ -2,6 +2,7 @@ package response;
 
 import java.io.FileInputStream;
 import java.io.OutputStream;
+import java.util.ResourceBundle;
 
 import static support.Util.*;
 
@@ -9,11 +10,11 @@ import static support.Util.*;
  * Created by ryosuke on 2016/11/06.
  */
 public class Send4xxResponse {
-    private static final String HTTP_VERSION = "HTTP/1.1";
+    public static void send404Response(OutputStream outputStream, String errorDocumentRoot) throws Exception{
+        ResourceBundle rb = ResourceBundle.getBundle("application");
 
-    public static void Send404Response(OutputStream outputStream, String errorDocumentRoot) throws Exception{
         // レスポンスヘッダを返す
-        writeLine(outputStream, HTTP_VERSION + " 404 Not Found");
+        writeLine(outputStream, rb.getString("http-version") + " 404 Not Found");
         writeLine(outputStream, "Date: " + getDateStringUtc());
         writeLine(outputStream, "Server: Sever04.java");
         writeLine(outputStream, "Connection: close");
